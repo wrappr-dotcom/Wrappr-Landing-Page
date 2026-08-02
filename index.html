@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wrappr — Corporate gifting, chosen not assigned</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="description" content="Wrappr gives every employee a Diwali gift budget and lets them choose what to receive, with an option to top up for something premium. Starting with Coimbatore SMEs.">
+<meta property="og:title" content="Wrappr — Give every employee a budget. Let them pick the gift.">
+<meta property="og:description" content="A per-employee Diwali gift budget platform for Indian SMEs. Employees choose from a curated catalog and can upgrade if they want to. Now in early access.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Wrappr — Give every employee a budget. Let them pick the gift.">
+<meta name="twitter:description" content="A per-employee Diwali gift budget platform for Indian SMEs, starting in Coimbatore.">
+<meta name="twitter:image" content="og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16241C;
+    --paper:#EDE6D6;
+    --paper-2:#E3DAC4;
+    --gold:#B8862E;
+    --emerald:#1F4D3A;
+    --emerald-2:#284F3D;
+    --ribbon:#8C2F22;
+    --cream-text:#F6F1E4;
+    --line: rgba(22,36,28,0.14);
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; overflow-x:hidden;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
+  }
+  a{color:inherit;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px; position:relative;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* ---------- ambient background (liquid glass base) ---------- */
+  .bg-blobs{position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
+  .blob{position:absolute; border-radius:50%; filter:blur(70px); opacity:0.55;}
+  .blob-1{width:520px; height:520px; top:-160px; left:-120px; background:radial-gradient(circle at 30% 30%, var(--emerald), transparent 70%);}
+  .blob-2{width:460px; height:460px; top:220px; right:-160px; background:radial-gradient(circle at 60% 40%, var(--gold), transparent 70%); opacity:0.4;}
+  .blob-3{width:420px; height:420px; bottom:-140px; left:20%; background:radial-gradient(circle at 50% 50%, var(--ribbon), transparent 70%); opacity:0.3;}
+
+  /* ---------- glass panel ---------- */
+  .glass{
+    background:rgba(255,255,255,0.4);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.6);
+    box-shadow:0 8px 32px rgba(22,36,28,0.10), inset 0 1px 0 rgba(255,255,255,0.7);
+    border-radius:16px;
+  }
+  .glass-dark{
+    background:linear-gradient(135deg, rgba(31,77,58,0.82), rgba(40,79,61,0.72));
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.16);
+    box-shadow:0 8px 32px rgba(22,36,28,0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+    border-radius:16px;
+  }
+
+  /* ---------- simple scroll reveal ---------- */
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity 0.7s ease, transform 0.7s ease;}
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+
+  /* ---------- texture ---------- */
+  .kraft-texture{
+    position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(22,36,28,0.02) 0px, rgba(22,36,28,0.02) 1px, transparent 1px, transparent 3px);
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:sticky; top:0; z-index:20;
+    background:rgba(237,230,214,0.55);
+    -webkit-backdrop-filter:blur(16px) saturate(180%);
+    backdrop-filter:blur(16px) saturate(180%);
+    border-bottom:1px solid rgba(255,255,255,0.5);
+  }
+  .navrow{display:flex; align-items:center; justify-content:space-between; padding:18px 32px; gap:20px;}
+  .nav-links{display:flex; align-items:center; gap:28px; margin-left:auto; margin-right:28px;}
+  .nav-links a{
+    font-family:'IBM Plex Mono', monospace; font-size:0.82rem; text-decoration:none; color:rgba(22,36,28,0.7);
+    transition:color 0.2s ease;
+  }
+  .nav-links a:hover{color:var(--ribbon);}
+  @media (max-width:640px){ .nav-links{display:none;} }
+  .brand{
+    font-family:'Fraunces', serif; font-weight:600; font-size:1.35rem; letter-spacing:0.01em;
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--ribbon); display:inline-block;}
+  .nav-cta{
+    font-family:'Work Sans', sans-serif; font-weight:600; font-size:0.85rem;
+    background:var(--emerald); color:var(--cream-text);
+    padding:10px 18px; border-radius:3px; text-decoration:none;
+    letter-spacing:0.02em;
+    box-shadow:0 2px 10px rgba(31,77,58,0.35);
+    transition:background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .nav-cta:hover{background:var(--emerald-2); transform:translateY(-1px); box-shadow:0 4px 14px rgba(31,77,58,0.4);}
+  .nav-cta:focus-visible{outline:2px solid var(--ribbon); outline-offset:3px;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative; z-index:1;
+    padding:96px 0 72px;
+    max-width:700px;
+    margin:0 auto;
+  }
+  @media (max-width:860px){ .hero{padding:56px 0 40px;} }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--ribbon); margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--ribbon); display:inline-block;}
+  h1{
+    font-family:'Fraunces', serif; font-weight:600; font-optical-sizing:auto;
+    font-size:clamp(2.3rem, 4.4vw, 3.6rem); line-height:1.06; letter-spacing:-0.01em;
+    margin:0 0 22px;
+  }
+  h1 em{font-style:italic; color:var(--emerald); font-weight:500;}
+  .hero p.sub{font-size:1.08rem; color:rgba(22,36,28,0.78); max-width:46ch; margin:0 0 30px;}
+  .hero-actions{display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+  .btn-primary{
+    background:var(--ribbon); color:var(--cream-text); font-weight:600; font-size:0.95rem;
+    padding:14px 26px; border-radius:3px; text-decoration:none; display:inline-block;
+    transition:transform 0.2s ease, background 0.2s ease;
+  }
+  .btn-primary:hover{background:#7a281d; transform:translateY(-2px);}
+  .btn-primary:focus-visible{outline:2px solid var(--emerald); outline-offset:3px;}
+  .btn-ghost{
+    font-family:'IBM Plex Mono', monospace; font-size:0.85rem; color:var(--ink); text-decoration:none;
+    border-bottom:1px solid var(--ink); padding-bottom:2px;
+  }
+
+  /* ---------- section spacing ---------- */
+  .gap{height:8px;}
+
+  /* ---------- section shell ---------- */
+  section{position:relative; z-index:1; padding:64px 0;}
+  .section-head{margin-bottom:40px; max-width:56ch;}
+  .k{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--emerald); margin-bottom:10px; display:block;
+  }
+  h2{font-family:'Fraunces', serif; font-weight:600; font-size:clamp(1.6rem,2.6vw,2.1rem); margin:0 0 8px;}
+  .section-head p{color:rgba(22,36,28,0.72); font-size:1rem; margin:0;}
+
+  /* ---------- how it works ---------- */
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:0; overflow:hidden;}
+  @media (max-width:760px){ .steps{grid-template-columns:1fr;} }
+  .step{
+    padding:30px 28px 32px; border-right:1px solid rgba(22,36,28,0.10);
+    position:relative;
+  }
+  .step:last-child{border-right:none;}
+  @media (max-width:760px){ .step{border-right:none; border-bottom:1px solid rgba(22,36,28,0.10);} .step:last-child{border-bottom:none;} }
+  .step .label{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--ribbon); margin-bottom:14px; display:block;
+  }
+  .step h3{font-family:'Fraunces', serif; font-weight:600; font-size:1.2rem; margin:0 0 8px;}
+  .step p{color:rgba(22,36,28,0.72); font-size:0.94rem; margin:0;}
+
+  /* ---------- budget strip ---------- */
+  .budget{
+    color:var(--cream-text);
+    padding:36px 34px; display:grid; grid-template-columns:1.2fr 1fr; gap:32px; align-items:center;
+  }
+  @media (max-width:760px){ .budget{grid-template-columns:1fr;} }
+  .budget h3{font-family:'Fraunces', serif; font-weight:600; font-size:1.4rem; margin:0 0 10px;}
+  .budget p{color:rgba(246,241,228,0.82); font-size:0.96rem; margin:0;}
+  .meter{background:rgba(246,241,228,0.14); border-radius:4px; padding:20px; font-family:'IBM Plex Mono', monospace;}
+  .meter-row{display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:10px; color:rgba(246,241,228,0.75);}
+  .meter-bar{height:10px; border-radius:99px; background:rgba(246,241,228,0.16); overflow:hidden; margin-bottom:14px;}
+  .meter-fill{height:100%; width:62%; background:var(--gold); border-radius:99px;}
+  .meter-fill.up{width:100%; background:var(--ribbon);}
+
+  /* ---------- who it's for ---------- */
+  .who{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+  @media (max-width:760px){ .who{grid-template-columns:1fr;} }
+  .who .card{padding:26px;}
+  .who .card .k2{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--ribbon); text-transform:uppercase; letter-spacing:0.06em;}
+  .who .card p{margin:10px 0 0; color:rgba(22,36,28,0.78); font-size:0.94rem;}
+
+  /* ---------- form section ---------- */
+  .form-section{padding:0; overflow:hidden;}
+  .form-head{padding:36px 36px 8px;}
+  .form-head .k{margin-bottom:10px;}
+  .form-frame-wrap{padding:44px 36px 48px; text-align:center;}
+  .form-open-btn{
+    display:inline-block; background:var(--ribbon); color:var(--cream-text);
+    font-family:'Work Sans', sans-serif; font-weight:600; font-size:1.05rem;
+    padding:18px 42px; border-radius:4px; text-decoration:none;
+    transition:transform 0.2s ease, background 0.2s ease;
+  }
+  .form-open-btn:hover{background:#7a281d; transform:translateY(-2px);}
+  .form-open-btn:focus-visible{outline:2px solid var(--emerald); outline-offset:3px;}
+  .form-note{
+    margin:16px 0 0; font-family:'IBM Plex Mono', monospace; font-size:0.8rem; color:rgba(22,36,28,0.55);
+  }
+
+  /* ---------- trust strip ---------- */
+  .trust{
+    display:flex; align-items:center; gap:10px; margin-top:26px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.8rem; color:rgba(22,36,28,0.6);
+  }
+  .trust .avatar{
+    width:26px; height:26px; border-radius:50%; background:var(--emerald); color:var(--cream-text);
+    display:flex; align-items:center; justify-content:center; font-family:'Fraunces', serif; font-size:0.8rem; font-weight:600;
+    flex-shrink:0;
+  }
+
+  /* ---------- founder note ---------- */
+  .founder{padding:30px 32px;}
+  .founder p{font-size:1rem; color:rgba(22,36,28,0.8); max-width:60ch; margin:0;}
+  .founder .sign{margin-top:14px; font-family:'Fraunces', serif; font-style:italic; color:var(--emerald); font-size:0.98rem;}
+
+  /* ---------- FAQ ---------- */
+  .faq{padding:6px;}
+  .faq-item{border-bottom:1px solid rgba(22,36,28,0.10);}
+  .faq-item:last-child{border-bottom:none;}
+  .faq-q{
+    width:100%; text-align:left; background:none; border:none; cursor:pointer;
+    font-family:'Fraunces', serif; font-weight:600; font-size:1.02rem; color:var(--ink);
+    padding:20px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px;
+  }
+  .faq-q .plus{font-family:'IBM Plex Mono', monospace; font-size:1.1rem; color:var(--ribbon); transition:transform 0.25s ease; flex-shrink:0;}
+  .faq-item.open .faq-q .plus{transform:rotate(45deg);}
+  .faq-a{
+    max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease;
+    padding:0 24px; color:rgba(22,36,28,0.72); font-size:0.94rem;
+  }
+  .faq-item.open .faq-a{max-height:220px; padding:0 24px 22px;}
+
+  /* ---------- footer contact ---------- */
+  .foot-contact{
+    font-family:'IBM Plex Mono', monospace; font-size:0.85rem; color:var(--emerald);
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  footer{padding:40px 0 60px; border-top:1px solid var(--line);}
+  .foot-row{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;}
+  .foot-note{font-family:'Fraunces', serif; font-style:italic; color:rgba(22,36,28,0.68); max-width:46ch; font-size:0.98rem;}
+  .foot-brand{font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:rgba(22,36,28,0.55);}
+</style>
+</head>
+<body>
+<div class="bg-blobs" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+<div class="kraft-texture" aria-hidden="true"></div>
+
+<header>
+  <div class="wrap navrow">
+    <div class="brand"><span class="dot" aria-hidden="true"></span>Wrappr</div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a class="nav-cta" href="#access">Request early access</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero reveal">
+    <div>
+      <span class="eyebrow">Corporate gifting · Diwali 2026 · Coimbatore pilot</span>
+      <h1>Give every employee a budget.<br>Let them pick the <em>gift</em>.</h1>
+      <p class="sub">Wrappr replaces the one-size-fits-all hamper with a per-employee gift budget — employees choose from a curated catalog, and can top up for something premium if they want to.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#access">Request early access</a>
+        <a class="btn-ghost" href="#how">See how it works ↓</a>
+      </div>
+      <div class="trust">
+        <span class="avatar">W</span>
+        <span>Built by Coimbatore-based founders — launching before Diwali 2026</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap" id="how">
+  <section class="reveal">
+    <div class="section-head">
+      <span class="k">How it works</span>
+      <h2>Three steps, no fixed hampers</h2>
+      <p>Set once. Employees take it from there.</p>
+    </div>
+    <div class="steps glass">
+      <div class="step">
+        <span class="label">Step 1</span>
+        <h3>Set a budget</h3>
+        <p>Decide a per-employee amount for the occasion — Diwali, work anniversaries, or milestones.</p>
+      </div>
+      <div class="step">
+        <span class="label">Step 2</span>
+        <h3>They choose</h3>
+        <p>Employees pick from a curated catalog of brands within budget — no more guessing sizes or tastes.</p>
+      </div>
+      <div class="step">
+        <span class="label">Step 3</span>
+        <h3>Upgrade, optionally</h3>
+        <p>Want something above budget? Employees can top up the difference themselves and keep the gift.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section class="reveal">
+    <div class="budget glass-dark">
+      <div>
+        <h3>The upgrade engine</h3>
+        <p>A ₹1,000 company budget doesn't have to cap the gift. If an employee wants a ₹1,600 pair of earphones, they add ₹600 and it's theirs — you still only pay the budget you set.</p>
+      </div>
+      <div class="meter">
+        <div class="meter-row"><span>Company budget</span><span>₹1,000</span></div>
+        <div class="meter-bar"><div class="meter-fill"></div></div>
+        <div class="meter-row"><span>With employee top-up</span><span>₹1,600</span></div>
+        <div class="meter-bar"><div class="meter-fill up"></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section class="reveal">
+    <div class="section-head">
+      <span class="k">Who it's for</span>
+      <h2>Built for SMEs first</h2>
+      <p>Starting with Coimbatore, ahead of this year's Diwali order window. If your team is anywhere from 1 to 1000 employees, you're the right fit — the form's size brackets go up to 501-1000.</p>
+    </div>
+    <div class="who">
+      <div class="card glass">
+        <span class="k2">Company size</span>
+        <p>Best suited for teams of roughly 50–500, where a fixed hamper vendor stops making sense but a full HR gifting platform feels heavy.</p>
+      </div>
+      <div class="card glass">
+        <span class="k2">Timing</span>
+        <p>Built around the Diwali order cycle — get your team's picks locked in before the festive rush hits vendor lead times.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section class="reveal">
+    <div class="founder glass">
+      <p>We're building Wrappr because every festive season, companies hand out the same generic hamper to everyone — some employees love it, most just leave it unopened. This is a small, honest attempt to fix that: set a budget, let people choose. Right now it's just getting started with a small founding team, so if you fill the form below, expect a real reply from us, not a bot.</p>
+      <p class="sign">— Team Wrappr</p>
+    </div>
+  </section>
+</div>
+
+<div class="wrap" id="faq">
+  <section class="reveal">
+    <div class="section-head">
+      <span class="k">Questions</span>
+      <h2>Before you fill the form</h2>
+    </div>
+    <div class="faq glass">
+      <div class="faq-item">
+        <button class="faq-q" type="button"><span>Do I need to sign a contract or pay anything now?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>No. This form is only to gauge interest — there's no payment, contract, or commitment involved at this stage.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button"><span>Is this a real, functioning platform yet?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>Not yet — Wrappr is in early access and being validated before we build it out. Your response helps decide what actually gets built.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button"><span>Who handles payment and vendor coordination?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>Once live, Wrappr would coordinate with brand partners directly — you'd only need to set a budget and share it with your team.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button"><span>What happens after I submit the form?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>We'll personally reach out over email or phone to understand your gifting needs before Diwali planning starts.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap" id="access">
+  <section class="reveal">
+    <div class="form-section glass">
+      <div class="form-head">
+        <span class="k">Early access</span>
+        <h2>Tell us about your Diwali gifting</h2>
+        <p style="color:rgba(22,36,28,0.7); margin-top:8px; max-width:52ch;">Two minutes. We'll reach out before we build anything, not after.</p>
+      </div>
+      <div class="form-frame-wrap">
+        <a class="form-open-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScp5UCoThnGuctsYJgNTjvYoeKk5ASgFnYQ2iyUX0tWgAEsfA/viewform" target="_blank" rel="noopener">
+          Fill the form →
+        </a>
+        <p class="form-note">Opens in a new tab · takes 2 minutes</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap foot-row">
+    <p class="foot-note">Wrappr is starting as a small pilot in Coimbatore — this page exists to find out if it's worth building further. Prefer email? <a class="foot-contact" href="mailto:teamwrappr@gmail.com">teamwrappr@gmail.com</a></p>
+    <span class="foot-brand">WRAPPR · 2026</span>
+  </div>
+</footer>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(el => io.observe(el));
+
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.faq-item').classList.toggle('open');
+    });
+  });
+</script>
+
+</body>
+</html>
